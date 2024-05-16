@@ -19,22 +19,25 @@ class DisplayMessages extends React.Component {
    })
  }
   submitMessage(){
+    const currentMessage = this.state.input;
     this.setState({
       input: '',
-      messages: [...this.state.messages, this.state.input]
-    })
+      messages: this.state.messages.concat(currentMessage)
+      });
   }
   submitAlert(){
+    const currentAlert = this.state.input;
     this.setState({
       input: '',
-      alerts: [...this.state.alerts, this.state.input]
-    })
+      alerts: this.state.messages.concat(currentAlert)
+      });
   }
   submitSpam(){
+    const currentSpam = this.state.input;
     this.setState({
       input: '',
-      spam: [...this.state.messages, this.state.input]
-    })
+      spams: this.state.messages.concat(currentSpams)
+      });
   }
   render() {
     return (
@@ -53,14 +56,14 @@ class DisplayMessages extends React.Component {
         
         
         <ul>
-          {this.state.messages.map((x, i)=>{
-            return <li key={i}>{x}</li>
+          {this.state.messages.map((message, i)=>{
+            return <li key={i}>{message}</li>
           })}
-          {this.state.alerts.map((x, i)=>{
-            return <li key={i}>{x}</li>
+          {this.state.alerts.map((alert, i)=>{
+            return <li key={i}>{alert}</li>
           })}
-          {this.state.spam.map((x, i)=>{
-            return <li key={i}>{x}</li>
+          {this.state.spam.map((spam, i)=>{
+            return <li key={i}>{spam}</li>
           })}
           
         </ul>
@@ -71,3 +74,89 @@ class DisplayMessages extends React.Component {
   }
 };
 
+const ADD = "ADD";
+const addMessage = message => {
+  return {
+    type: ADD,
+    message
+  };
+};
+const addAlert = alert => {
+  return {
+    type: ADD,
+    alert
+  };
+};
+const addSpam = spam => {
+  return {
+    type: ADD,
+    spam
+  };
+};
+
+
+// Use ES6 default paramter to give the 'previousState' parameter an initial value.
+const messageReducer = (previousState = [], action) => {
+  // Use switch statement to lay out the reducer logic in response to different action type
+  switch (action.type) {
+    case ADD:
+      // Use ES6 spread operator to return a new array where the new message is added to previousState
+      return [...previousState, action.message];
+      break;
+
+    default:
+      // A default case to fall back on in case if the update to Redux store is not for this specific state.
+      return previousState;
+  }
+};
+const alertReducer = (previousState = [], action) => {
+  
+  switch (action.type) {
+    case ADD:
+    
+      return [...previousState, action.alert];
+      break;
+
+    default:
+  
+      return previousState;
+  }
+};
+const spamReducer = (previousState = [], action) => {
+ 
+  switch (action.type) {
+    case ADD:
+   
+      return [...previousState, action.spam];
+      break;
+
+    default:
+      
+      return previousState;
+  }
+};
+
+const store = Redux.createStore(messageReducer);
+const alertstore = Redux.createStore(alertReducer);
+const spamstore = Redux.createStore(spamReducer);
+
+const Provider = ReactRedux.Provider;
+
+  class AppWrapper extends React.Component {
+    // Below is the code required to pass the test
+    render() {
+      return (
+        <Provider store={store}>
+         <DisplayMessages />
+        </Provider> 
+        <Provider alertstore={alertstore}>
+         <DisplayMessages />
+        </Provider>
+        <Provider spamstore={spamstore}>
+        <DisplayMessages />
+        </Provider>
+          
+      );
+    }
+    
+  };
